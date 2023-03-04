@@ -1,57 +1,101 @@
 <?php
+declare(strict_types=1);
 
 namespace Maatcode\Session\Storage;
 
-class SessionStorage
+class SessionStorage implements SessionStorageInterface
 {
+    /**
+     * @var string
+     */
     protected string $sessionName;
 
+    /**
+     * @param $sessionName
+     */
     public function __construct($sessionName)
     {
-        if ( static::isSessionStarted() === FALSE ) session_start();
+        if (static::isSessionStarted() === false) session_start();
         $this->sessionName = $sessionName;
         $this->initSession();
     }
 
-    protected function initSession() {
-        if (!isset($_SESSION[$this->sessionName])){
+    /**
+     * @return void
+     */
+    protected function initSession(): void
+    {
+        if (!isset($_SESSION[$this->sessionName]))
+        {
             $_SESSION[$this->sessionName] = [];
         }
     }
 
-    public function set($key, $value) : SessionStorage {
-        if (isset($_SESSION[$this->sessionName])) {
+    /**
+     * @param $key
+     * @param $value
+     * @return $this
+     */
+    public function set($key, $value): SessionStorage
+    {
+        if (isset($_SESSION[$this->sessionName]))
+        {
             $_SESSION[$this->sessionName][$key] = $value;
         }
         return $this;
     }
 
-    public function get($key) {
+    /**
+     * @param $key
+     * @return mixed|null
+     */
+    public function get($key): mixed
+    {
         return $_SESSION[$this->sessionName][$key] ?? null;
     }
-    public function unset($key) {
-        if (isset($_SESSION[$this->sessionName])) {
+
+    /**
+     * @param $key
+     * @return void
+     */
+    public function unset($key): void
+    {
+        if (isset($_SESSION[$this->sessionName]))
+        {
             unset($_SESSION[$this->sessionName][$key]);
         }
     }
 
-    public function getSession($sessionName = null) {
-        if ($sessionName) {
+    /**
+     * @param $sessionName
+     * @return array|mixed
+     */
+    public function getSession($sessionName = null): mixed
+    {
+        if ($sessionName)
+        {
             return $_SESSION[$this->sessionName];
         }
         return $_SESSION;
     }
 
-    private static function isSessionStarted()
+    /**
+     * @return bool
+     */
+    private static function isSessionStarted(): bool
     {
-        if ( php_sapi_name() !== 'cli' ) {
-            if ( version_compare(phpversion(), '5.4.0', '>=') ) {
+        if (php_sapi_name() !== 'cli')
+        {
+            if (version_compare(phpversion(), '5.4.0', '>='))
+            {
                 return session_status() === PHP_SESSION_ACTIVE;
-            } else {
+            }
+            else
+            {
                 return !(session_id() === '');
             }
         }
-        return FALSE;
+        return false;
     }
 
 }
